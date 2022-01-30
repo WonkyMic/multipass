@@ -1,43 +1,41 @@
-use crate::clients;
-use crate::data;
+use crate::clients::twitter::get;
+use crate::data::twitter;
+use serde_json;
 
-pub async fn find(name: &str) -> Result<data::twitter::User, reqwest::Error> {    
-    let full_url = format!("{}/users/by/username/{}", *data::twitter::URL, name);
+pub async fn find(name: &str) -> Result<twitter::User, reqwest::Error> {    
+    let url = format!("{}/users/by/username/{}", *twitter::URL, name);
 
-    let client = clients::twitter::build_client().unwrap();
-    let resp = client
-        .get(full_url) 
-        .send()
-        .await?
-        .json::<data::twitter::user::Response>()
-        .await?;
+    let resp = get(&url)
+        .await.unwrap()
+        .as_string().unwrap();
 
-    Ok(resp.data)
+    let json_resp: twitter::user::Response = serde_json::from_str(resp.as_str()).unwrap();
+ 
+    Ok(json_resp.data)
 }
 
-pub async fn followers(id: &str) -> Result<Vec<data::twitter::User>, reqwest::Error> {
-    let full_url = format!("{}/users/{}/followers", *data::twitter::URL, &id);
+pub async fn followers(id: &str) -> Result<Vec<twitter::User>, reqwest::Error> {
+    let url = format!("{}/users/{}/followers", *twitter::URL, &id);
 
-    let client = clients::twitter::build_client().unwrap();
-    let resp = client.get(full_url)
-        .send()
-        .await?
-        .json::<data::twitter::user::FollowResponse>()
-        .await?;
+    let resp = get(&url)
+        .await.unwrap()
+        .as_string().unwrap();
 
-    Ok(resp.data)
+    let json_resp: twitter::user::FollowResponse = serde_json::from_str(resp.as_str()).unwrap();
+
+    Ok(json_resp.data)
 }
 
-pub async fn following(id: &str) -> Result<Vec<data::twitter::User>, reqwest::Error> {
-    let full_url = format!("{}/users/{}/following", *data::twitter::URL, id);
+pub async fn following(id: &str) -> Result<Vec<twitter::User>, reqwest::Error> {
+    let url = format!("{}/users/{}/following", *twitter::URL, id);
 
-    let client = clients::twitter::build_client().unwrap();
-    let resp = client.get(full_url)
-        .send()
-        .await?
-        .json::<data::twitter::user::FollowResponse>()
-        .await?;
+    let resp = get(&url)
+        .await.unwrap()
+        .as_string().unwrap();
 
-    Ok(resp.data)
+    let json_resp: twitter::user::FollowResponse = serde_json::from_str(resp.as_str()).unwrap();
+
+    Ok(json_resp.data)
+
 }
 

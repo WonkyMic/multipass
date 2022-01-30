@@ -5,6 +5,7 @@ extern crate reqwest;
 extern crate serde;
 extern crate serde_json;
 extern crate wasm_bindgen_futures;
+extern crate web_sys;
 
 mod clients;
 mod data;
